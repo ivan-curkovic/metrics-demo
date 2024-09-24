@@ -1,0 +1,33 @@
+# this docker compose fill will start grafana, prometheus and node-exporter services
+version: '3.8'
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+
+  mygrafana:
+    build: .
+    ports:
+      - "8080:8080"
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - "9100:9100"
+
+volumes:
+  grafana-data:
+  prometheus-data:
