@@ -12,6 +12,24 @@ import (
 	"github.com/testcontainers/testcontainers-go/wait"
 )
 
+func buildContainer(t *testing.T) {
+	ctx := context.Background()
+
+	// Build the Docker image
+	_, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: testcontainers.ContainerRequest{
+			FromDockerfile: testcontainers.FromDockerfile{
+				Context:    ".",
+				Dockerfile: "Dockerfile", // Replace with the path to your Dockerfile
+			},
+		},
+		Started: false,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func setupContainer(t *testing.T) (testcontainers.Container, string) {
 	ctx := context.Background()
 
@@ -43,6 +61,7 @@ func setupContainer(t *testing.T) (testcontainers.Container, string) {
 }
 
 func TestRootRoute(t *testing.T) {
+	buildContainer(t)
 	container, url := setupContainer(t)
 	defer container.Terminate(context.Background())
 
@@ -62,6 +81,7 @@ func TestRootRoute(t *testing.T) {
 }
 
 func TestMetricsRoute(t *testing.T) {
+	buildContainer(t)
 	container, url := setupContainer(t)
 	defer container.Terminate(context.Background())
 

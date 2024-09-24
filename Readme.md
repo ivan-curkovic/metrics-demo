@@ -9,3 +9,6 @@
 
 # run tests
 `go test`
+
+# run tests verbosely
+`go test -v`
