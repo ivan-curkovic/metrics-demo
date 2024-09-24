@@ -12,3 +12,6 @@
 
 # run tests verbosely
 `go test -v`
+
+# run docker build cloud
+`docker buildx build --builder cloud-ivancurkovic046-cloudbuilder .`
