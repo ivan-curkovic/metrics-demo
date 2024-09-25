@@ -1,25 +1,29 @@
 package main
 
 import (
-	"github.com/Depado/ginprom"
-	"github.com/gin-gonic/gin"
+	"fmt"
+	"net/http"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+var rootCounter = prometheus.NewCounter(
+	prometheus.CounterOpts{
+		Name: "root_request_count",
+		Help: "No of request handled by root handler",
+	},
+)
+
+func root(w http.ResponseWriter, req *http.Request) {
+	rootCounter.Inc()
+	fmt.Fprintf(w, "hello")
+}
+
 func main() {
-	r := gin.Default()
+	prometheus.MustRegister(rootCounter)
 
-	p := ginprom.New(
-		ginprom.Engine(r),
-		ginprom.Subsystem("gin"),
-		ginprom.Path("/metrics"),
-	)
-	r.Use(p.Instrument())
-
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Hello, World!",
-		})
-	})
-
-	r.Run(":8080")
+	http.HandleFunc("/", root)
+	http.Handle("/metrics", promhttp.Handler())
+	http.ListenAndServe(":8080", nil)
 }

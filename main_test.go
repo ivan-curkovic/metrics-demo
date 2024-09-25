@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -20,7 +20,7 @@ func buildContainer(t *testing.T) {
 		ContainerRequest: testcontainers.ContainerRequest{
 			FromDockerfile: testcontainers.FromDockerfile{
 				Context:    ".",
-				Dockerfile: "Dockerfile", // Replace with the path to your Dockerfile
+				Dockerfile: "Dockerfile",
 			},
 		},
 		Started: false,
@@ -34,8 +34,8 @@ func setupContainer(t *testing.T) (testcontainers.Container, string) {
 	ctx := context.Background()
 
 	req := testcontainers.ContainerRequest{
-		Image:        "metrics-demo",       // Replace with your image name
-		ExposedPorts: []string{"8080/tcp"}, // Replace with the port your app listens on
+		Image:        "ivancurkovic046/metrics-demo:latest",
+		ExposedPorts: []string{"8080/tcp"},
 		WaitingFor:   wait.ForHTTP("/").WithStatusCodeMatcher(func(status int) bool { return status == 200 }),
 	}
 
@@ -71,13 +71,13 @@ func TestRootRoute(t *testing.T) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-	assert.Equal(t, "{\"message\":\"Hello, World!\"}", string(body)) // Replace with your expected response
+	assert.Equal(t, "hello", string(body))
 }
 
 func TestMetricsRoute(t *testing.T) {
@@ -91,7 +91,7 @@ func TestMetricsRoute(t *testing.T) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatal(err)
 	}
