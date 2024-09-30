@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -15,15 +15,18 @@ var rootCounter = prometheus.NewCounter(
 	},
 )
 
-func root(w http.ResponseWriter, req *http.Request) {
+func root(c *gin.Context) {
 	rootCounter.Inc()
-	fmt.Fprintf(w, "hello")
+	c.String(http.StatusOK, "hello")
 }
 
 func main() {
 	prometheus.MustRegister(rootCounter)
 
-	http.HandleFunc("/", root)
-	http.Handle("/metrics", promhttp.Handler())
-	http.ListenAndServe(":8080", nil)
+	r := gin.Default()
+
+	r.GET("/", root)
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
+
+	r.Run(":8080")
 }
