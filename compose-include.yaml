@@ -1,0 +1,2 @@
+include:
+  - oci://docker.io/ivancurkovic046/metrics-demo:compose.yaml

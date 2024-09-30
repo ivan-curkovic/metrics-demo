@@ -27,5 +27,12 @@ clean:
 test:
 	go test -v
 
+compose-include:
+	COMPOSE_EXPERIMENTAL_OCI_REMOTE=true docker compose -f compose-include.yaml up
+
+push-compose:
+	oras push --artifact-type=application/vnd.docker.compose.project registry-1.docker.io/ivancurkovic046/metrics-demo:compose.yaml compose.yaml:compose/yaml
+
+
 # Build, push, and test[]
 all: build push test
